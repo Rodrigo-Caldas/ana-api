@@ -23,6 +23,6 @@ class Configuracoes(BaseSettings):
         "TipoEstacaoTelemetrica",
         "Operando",
     ]
-    limitador_tarefas: asyncio.Semaphore = asyncio.Semaphore(5)
+    limitador_tarefas: asyncio.Semaphore = asyncio.Semaphore(7)
 
 config = Configuracoes()
