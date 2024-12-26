@@ -1,33 +1,12 @@
 """Funções relacionadas a API da ANA."""
 
+from typing import Any, Dict, List
+from ana.config import config 
+
 import asyncio
 import xml.etree.ElementTree as ET
-
-from typing import Any
-from typing import Dict
-from typing import List
-
 import httpx
 import pandas as pd
-
-############## Configurações #############
-url_base = "http://telemetriaws1.ana.gov.br/ServiceANA.asmx"
-
-lista_ana = [
-    "Latitude",
-    "Longitude",
-    "Altitude",
-    "Codigo",
-    "Nome",
-    "BaciaCodigo",
-    "SubBaciaCodigo",
-    "nmEstado",
-    "TipoEstacao",
-    "TipoEstacaoTelemetrica",
-    "Operando",
-]
-
-limitador_tarefas = asyncio.Semaphore(5)
 
 
 def requisitar_inventario() -> ET.Element:
@@ -46,7 +25,7 @@ def requisitar_inventario() -> ET.Element:
         codigo = ""
         telemetrica = ""
         url_requisicao = (
-            f"{url_base}/HidroInventario?codEstDE={codigo}&codEstATE=&tpEst={tipo_estacao}"
+            f"{config.url_base}/HidroInventario?codEstDE={codigo}&codEstATE=&tpEst={tipo_estacao}"
             f"&nmEst=&nmRio=&codSubBacia=&codBacia=&nmMunicipio=&nmEstado=&sgResp=&sgOper=&"
             f"telemetrica={telemetrica}"
         )
@@ -66,7 +45,7 @@ def requisitar_inventario() -> ET.Element:
 
 
 def parsear_inventario_xml(
-    raiz: ET.Element, lista_ana: List[str] = lista_ana
+    raiz: ET.Element, lista_ana: List[str] = config.lista_ana
 ) -> List[Dict[str, Any]]:
     """
     Parseia os elementos XML da requisição de inventario.
@@ -76,7 +55,7 @@ def parsear_inventario_xml(
     raiz : ET.Element
         Raiz da requisição.
     lista_ana : List[str], optional
-        Lista com os parâmetros que queremos buscar, by default lista_ana.
+        Lista com os parâmetros que queremos buscar, by default config.lista_ana.
 
     Returns
     -------
@@ -176,7 +155,7 @@ def requisitar_serie(codigo: str, data_inicio: str, data_fim: str = "") -> ET.El
         Raiz do XML da requisição.
     """
     url_requisicao = (
-        f"{url_base}/DadosHidrometeorologicos?codEstacao={codigo}"
+        f"{config.url_base}/DadosHidrometeorologicos?codEstacao={codigo}"
         f"&dataInicio={data_inicio}&dataFim={data_fim}"
     )
 
@@ -237,7 +216,7 @@ def transformar_csv(df: pd.DataFrame, codigo: str) -> None:
     df2["hora"] = pd.to_datetime(df2["data"])
     df2["data"] = df2["data"].dt.normalize()
     df2.iloc[0::, 1] = df.iloc[0, 1]
-    
+
     df2.to_csv(f"{codigo}.csv")
 
 
@@ -254,10 +233,10 @@ async def obter_chuva(codigo: str, data_inicio: str, data_fim: str = "") -> None
     data_fim : str, optional
         Data final da requisição dos dados, by default "".
     """
-    async with limitador_tarefas:
+    async with config.limitador_tarefas:
         async with httpx.AsyncClient() as cliente:
             url_requisicao = (
-                f"{url_base}/DadosHidrometeorologicos?codEstacao={codigo}"
+                f"{config.url_base}/DadosHidrometeorologicos?codEstacao={codigo}"
                 f"&dataInicio={data_inicio}&dataFim={data_fim}"
             )
 
