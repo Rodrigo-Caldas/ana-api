@@ -1,6 +1,7 @@
 """Funções relacionadas a API da ANA."""
 
-from ana.config import config 
+from ana.config import config
+from ana.loggit import log
 from typing import Any, Dict, List
 
 import asyncio
@@ -18,7 +19,7 @@ def requisitar_inventario() -> ET.Element:
     ET.Element
         Raiz do XML da requisição.
     """
-    print("Requisitando inventário ANA..")
+    log.info("Requisitando inventário ANA..")
 
     try:
         tipo_estacao = 2
@@ -35,10 +36,10 @@ def requisitar_inventario() -> ET.Element:
         conteudo_et = ET.fromstring(conteudo)
         arvore = ET.ElementTree(conteudo_et)
         raiz = arvore.getroot()
-        print("Requisição do inventário com sucesso!")
+        log.info("[bright_green]Requisição do inventário com sucesso!")
 
     except Exception as e:
-        print(f"Falha na requisição do inventário: {e}")
+        log.info(f"[bright_red]Falha na requisição do inventário: {e}")
         raise e
 
     return raiz
@@ -246,7 +247,7 @@ async def obter_chuva(codigo: str, data_inicio: str, data_fim: str = "") -> None
 
                 while resposta.status_code == 429:
                     await asyncio.sleep(2)
-                    print(f"Nova tentativa da estação {codigo}..")
+                    log.warning(f"Nova tentativa da estação {codigo}..")
                     resposta = await cliente.get(url_requisicao, timeout=None)
 
                 conteudo = resposta.content
@@ -256,14 +257,14 @@ async def obter_chuva(codigo: str, data_inicio: str, data_fim: str = "") -> None
                 df = parsear_serie_xml(raiz)
 
                 if not df.shape[0] > 0 or df["chuva"].isnull().all():
-                    print(f"Estação {codigo} sem dados!")
+                    log.info(f"Estação {codigo} sem dados!")
 
                 else:
                     transformar_csv(df, codigo)
-                    print(f"[bright_green]Estação {codigo} ok!")
+                    log.info(f"[bright_green]Estação {codigo} ok!")
 
             except Exception as e:
-                print(f"[bright_red]Falha na requisição: {e} {codigo}")
+                log.error(f"[bright_red]Falha na requisição: {e} {codigo}")
                 raise e
 
 
