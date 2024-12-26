@@ -5,6 +5,7 @@ import asyncio
 import geopandas as gpd
 
 from ana import ana, utils
+from ana.loggit import console
 
 
 def handler(data_inicio: str = "01-01-2019", data_fim: str = "") -> None:
@@ -18,7 +19,7 @@ def handler(data_inicio: str = "01-01-2019", data_fim: str = "") -> None:
     data_fim : str, optional
         Data final da requisição dos dados, by default "".
     """
-    print("Iniciando serviço de coleta de chuva horária da ANA.")
+    console.rule("Iniciando serviço de coleta de chuva horária da ANA.")
     shp_agua_vermelha = gpd.read_file(
         "Mapas/sub-bacias-isoladas/grande/agua_vermelha.shp"
     )
