@@ -1,7 +1,7 @@
 """Funções relacionadas a API da ANA."""
 
-from typing import Any, Dict, List
 from ana.config import config 
+from typing import Any, Dict, List
 
 import asyncio
 import xml.etree.ElementTree as ET
