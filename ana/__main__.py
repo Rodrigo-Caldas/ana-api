@@ -34,7 +34,7 @@ def handler(data_inicio: str = "01-01-2019", data_fim: str = "") -> None:
 
     asyncio.run(ana.obter_chuvas(lista_codigo, data_inicio, data_fim))
 
-    print("Fim do serviço!")
+    console.rule("Fim do serviço!")
 
 
 if __name__ == "__main__":
