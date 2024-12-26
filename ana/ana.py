@@ -1,33 +1,13 @@
 """Funções relacionadas a API da ANA."""
 
+from ana.config import config
+from ana.loggit import log
+from typing import Any, Dict, List
+
 import asyncio
 import xml.etree.ElementTree as ET
-
-from typing import Any
-from typing import Dict
-from typing import List
-
 import httpx
 import pandas as pd
-
-############## Configurações #############
-url_base = "http://telemetriaws1.ana.gov.br/ServiceANA.asmx"
-
-lista_ana = [
-    "Latitude",
-    "Longitude",
-    "Altitude",
-    "Codigo",
-    "Nome",
-    "BaciaCodigo",
-    "SubBaciaCodigo",
-    "nmEstado",
-    "TipoEstacao",
-    "TipoEstacaoTelemetrica",
-    "Operando",
-]
-
-limitador_tarefas = asyncio.Semaphore(5)
 
 
 def requisitar_inventario() -> ET.Element:
@@ -39,14 +19,14 @@ def requisitar_inventario() -> ET.Element:
     ET.Element
         Raiz do XML da requisição.
     """
-    print("Requisitando inventário ANA..")
+    log.info("Requisitando inventário ANA..")
 
     try:
         tipo_estacao = 2
         codigo = ""
         telemetrica = ""
         url_requisicao = (
-            f"{url_base}/HidroInventario?codEstDE={codigo}&codEstATE=&tpEst={tipo_estacao}"
+            f"{config.url_base}/HidroInventario?codEstDE={codigo}&codEstATE=&tpEst={tipo_estacao}"
             f"&nmEst=&nmRio=&codSubBacia=&codBacia=&nmMunicipio=&nmEstado=&sgResp=&sgOper=&"
             f"telemetrica={telemetrica}"
         )
@@ -56,17 +36,17 @@ def requisitar_inventario() -> ET.Element:
         conteudo_et = ET.fromstring(conteudo)
         arvore = ET.ElementTree(conteudo_et)
         raiz = arvore.getroot()
-        print("Requisição do inventário com sucesso!")
+        log.info("[bright_green]Requisição do inventário com sucesso!")
 
     except Exception as e:
-        print(f"Falha na requisição do inventário: {e}")
+        log.info(f"[bright_red]Falha na requisição do inventário: {e}")
         raise e
 
     return raiz
 
 
 def parsear_inventario_xml(
-    raiz: ET.Element, lista_ana: List[str] = lista_ana
+    raiz: ET.Element, lista_ana: List[str] = config.lista_ana
 ) -> List[Dict[str, Any]]:
     """
     Parseia os elementos XML da requisição de inventario.
@@ -76,7 +56,7 @@ def parsear_inventario_xml(
     raiz : ET.Element
         Raiz da requisição.
     lista_ana : List[str], optional
-        Lista com os parâmetros que queremos buscar, by default lista_ana.
+        Lista com os parâmetros que queremos buscar, by default config.lista_ana.
 
     Returns
     -------
@@ -176,7 +156,7 @@ def requisitar_serie(codigo: str, data_inicio: str, data_fim: str = "") -> ET.El
         Raiz do XML da requisição.
     """
     url_requisicao = (
-        f"{url_base}/DadosHidrometeorologicos?codEstacao={codigo}"
+        f"{config.url_base}/DadosHidrometeorologicos?codEstacao={codigo}"
         f"&dataInicio={data_inicio}&dataFim={data_fim}"
     )
 
@@ -237,7 +217,7 @@ def transformar_csv(df: pd.DataFrame, codigo: str) -> None:
     df2["hora"] = pd.to_datetime(df2["data"])
     df2["data"] = df2["data"].dt.normalize()
     df2.iloc[0::, 1] = df.iloc[0, 1]
-    
+
     df2.to_csv(f"{codigo}.csv")
 
 
@@ -254,10 +234,10 @@ async def obter_chuva(codigo: str, data_inicio: str, data_fim: str = "") -> None
     data_fim : str, optional
         Data final da requisição dos dados, by default "".
     """
-    async with limitador_tarefas:
+    async with config.limitador_tarefas:
         async with httpx.AsyncClient() as cliente:
             url_requisicao = (
-                f"{url_base}/DadosHidrometeorologicos?codEstacao={codigo}"
+                f"{config.url_base}/DadosHidrometeorologicos?codEstacao={codigo}"
                 f"&dataInicio={data_inicio}&dataFim={data_fim}"
             )
 
@@ -267,7 +247,7 @@ async def obter_chuva(codigo: str, data_inicio: str, data_fim: str = "") -> None
 
                 while resposta.status_code == 429:
                     await asyncio.sleep(2)
-                    print(f"Nova tentativa da estação {codigo}..")
+                    log.warning(f"Nova tentativa da estação {codigo}..")
                     resposta = await cliente.get(url_requisicao, timeout=None)
 
                 conteudo = resposta.content
@@ -277,14 +257,14 @@ async def obter_chuva(codigo: str, data_inicio: str, data_fim: str = "") -> None
                 df = parsear_serie_xml(raiz)
 
                 if not df.shape[0] > 0 or df["chuva"].isnull().all():
-                    print(f"Estação {codigo} sem dados!")
+                    log.info(f"Estação {codigo} sem dados!")
 
                 else:
                     transformar_csv(df, codigo)
-                    print(f"[bright_green]Estação {codigo} ok!")
+                    log.info(f"[bright_green]Estação {codigo} ok!")
 
             except Exception as e:
-                print(f"[bright_red]Falha na requisição: {e} {codigo}")
+                log.error(f"[bright_red]Falha na requisição: {e} {codigo}")
                 raise e
 
 
