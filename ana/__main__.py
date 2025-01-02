@@ -25,7 +25,7 @@ async def handler(data_inicio: str = "01-01-2019", data_fim: str = "") -> None:
     
     df_inventario = ana.mostrar_inventario()
 
-    caminho_base = Path("Mapas/sub-bacias-isoladas")
+    caminho_base = Path("mapas/sub-bacias-isoladas")
     caminhos = list(caminho_base.rglob("*.shp"))
 
     for bacia in caminhos:
