@@ -1,13 +1,15 @@
 """Funções relacionadas a API da ANA."""
 
-from ana.config import config
-from ana.loggit import log
-from typing import Any, Dict, List
-
 import asyncio
 import xml.etree.ElementTree as ET
+from pathlib import Path
+from typing import Any, Dict, List
+
 import httpx
 import pandas as pd
+
+from ana.config import config
+from ana.loggit import log
 
 
 def requisitar_inventario() -> ET.Element:
@@ -198,7 +200,7 @@ def parsear_serie_xml(raiz: ET.Element) -> pd.DataFrame:
     return serie
 
 
-def transformar_csv(df: pd.DataFrame, codigo: str) -> None:
+def transformar_csv(df: pd.DataFrame, codigo: str, caminho_csv: Path) -> None:
     """
     Transforma o DataFrame dos dados meteorológicos em csv.
 
@@ -208,6 +210,8 @@ def transformar_csv(df: pd.DataFrame, codigo: str) -> None:
         DataFrame contendo os dados gerais das estações.
     codigo : str
         Código da estação.
+    caminho_csv : Path
+        Caminho onde os dados csv serão guardados.
     """
     df["data"] = pd.to_datetime(df["data"])
     df = df.astype({"chuva": "float", "codigo": "int"})
@@ -218,10 +222,12 @@ def transformar_csv(df: pd.DataFrame, codigo: str) -> None:
     df2["data"] = df2["data"].dt.normalize()
     df2.iloc[0::, 1] = df.iloc[0, 1]
 
-    df2.to_csv(f"{codigo}.csv")
+    df2.to_csv(f"{caminho_csv}/{codigo}.csv")
 
 
-async def obter_chuva(codigo: str, data_inicio: str, data_fim: str = "") -> None:
+async def obter_chuva(
+    codigo: str, caminho_csv, data_inicio: str, data_fim: str = ""
+) -> None:
     """
     Busca os dados de chuva de uma estação de maneira assíncrona e salva em csv.
 
@@ -229,6 +235,8 @@ async def obter_chuva(codigo: str, data_inicio: str, data_fim: str = "") -> None
     ----------
     codigo : str
         Código da estação.
+    caminho_csv : Path
+        Caminho onde os dados csv serão guardados.
     data_inicio : str
         Data de início da requisição dos dados.
     data_fim : str, optional
@@ -260,7 +268,7 @@ async def obter_chuva(codigo: str, data_inicio: str, data_fim: str = "") -> None
                     log.info(f"Estação {codigo} sem dados!")
 
                 else:
-                    transformar_csv(df, codigo)
+                    transformar_csv(df, codigo, caminho_csv)
                     log.info(f"[bright_green]Estação {codigo} ok!")
 
             except Exception as e:
@@ -269,7 +277,7 @@ async def obter_chuva(codigo: str, data_inicio: str, data_fim: str = "") -> None
 
 
 async def obter_chuvas(
-    estacoes: List[str], data_inicio: str, data_fim: str = ""
+    estacoes: List[str], caminho_csv: Path, data_inicio: str, data_fim: str = ""
 ) -> None:
     """
     Busca os dados de chuva de uma lista de estações de maneira assíncrona.
@@ -278,6 +286,8 @@ async def obter_chuvas(
     ----------
     estacoes : List[str]
         Lista com os códigos das estações metereológicas.
+    caminho_csv : Path
+        Caminho onde os dados csv serão guardados.
     data_inicio : str
         Data de início da requisição dos dados.
     data_fim : str, optional
@@ -286,7 +296,7 @@ async def obter_chuvas(
     agendadas = set()
 
     for posto in estacoes:
-        task = obter_chuva(posto, data_inicio, data_fim)
+        task = obter_chuva(posto, caminho_csv, data_inicio, data_fim)
         agendadas.add(task)
 
     await asyncio.gather(*agendadas)

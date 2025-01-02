@@ -1,6 +1,7 @@
 """Configurações do serviço ana."""
 
 import asyncio
+from pathlib import Path
 from typing import List
 
 from pydantic_settings import BaseSettings
@@ -24,5 +25,8 @@ class Configuracoes(BaseSettings):
         "Operando",
     ]
     limitador_tarefas: asyncio.Semaphore = asyncio.Semaphore(7)
+    diretorio_dados: Path = Path("dados")
+
 
 config = Configuracoes()
+config.diretorio_dados.mkdir(parents=True, exist_ok=True)

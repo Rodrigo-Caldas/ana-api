@@ -5,10 +5,12 @@ import asyncio
 import geopandas as gpd
 
 from ana import ana, utils
+from ana.config import config
 from ana.loggit import console
+from pathlib import Path
 
 
-def handler(data_inicio: str = "01-01-2019", data_fim: str = "") -> None:
+async def handler(data_inicio: str = "01-01-2019", data_fim: str = "") -> None:
     """
     Execução do serviço de coleta da chuva horária dos postos em operação da ANA.
 
@@ -20,23 +22,30 @@ def handler(data_inicio: str = "01-01-2019", data_fim: str = "") -> None:
         Data final da requisição dos dados, by default "".
     """
     console.rule("Iniciando serviço de coleta de chuva horária da ANA.")
-    shp_agua_vermelha = gpd.read_file(
-        "Mapas/sub-bacias-isoladas/grande/agua_vermelha.shp"
-    )
-
+    
     df_inventario = ana.mostrar_inventario()
-    gdf_inventario_filtrado = utils.filtrar_postos_da_bacia(
-        df_inventario, shp_agua_vermelha
-    )
 
-    # gdf_codigos = gdf_inventario_filtrado[gdf_inventario_filtrado["operando"] == "sim"]
-    lista_codigo = gdf_inventario_filtrado["codigo"].tolist()
+    caminho_base = Path("mapas/sub-bacias-isoladas")
+    caminhos = list(caminho_base.rglob("*.shp"))
 
-    asyncio.run(ana.obter_chuvas(lista_codigo, data_inicio, data_fim))
+    for bacia in caminhos:
+        console.rule(f"Obtendo dados de {bacia.name}")
+        
+        caminho_csv = Path(config.diretorio_dados, bacia.name)
+        caminho_csv.mkdir(parents=True, exist_ok=True)
+
+        shp = gpd.read_file(bacia)
+        gdf_inventario_filtrado = utils.filtrar_postos_da_bacia(
+            df_inventario, shp
+        )
+
+        lista_codigo = gdf_inventario_filtrado["codigo"].tolist()
+
+        await ana.obter_chuvas(lista_codigo, data_inicio, data_fim)
 
     console.rule("Fim do serviço!")
 
 
 if __name__ == "__main__":
 
-    handler()
+    asyncio.run(handler())
