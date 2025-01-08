@@ -25,7 +25,7 @@ async def handler(data_inicio: str = "01-01-2019", data_fim: str = "") -> None:
     
     df_inventario = ana.mostrar_inventario()
 
-    caminho_base = Path("mapas/sub-bacias-isoladas")
+    caminho_base = Path("mapas", "sub-bacias-isoladas")
     caminhos = list(caminho_base.rglob("*.shp"))
 
     for bacia in caminhos:
@@ -41,7 +41,7 @@ async def handler(data_inicio: str = "01-01-2019", data_fim: str = "") -> None:
 
         lista_codigo = gdf_inventario_filtrado["codigo"].tolist()
 
-        await ana.obter_chuvas(lista_codigo, data_inicio, data_fim)
+        await ana.obter_chuvas(lista_codigo, caminho_csv, data_inicio, data_fim)
 
     console.rule("Fim do serviço!")
 

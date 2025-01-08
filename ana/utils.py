@@ -33,7 +33,7 @@ def filtrar_postos_da_bacia(
     )
 
     if shp.crs != gdf_inventario.crs:
-        shp = shp.set_crs(gdf_inventario.crs)
+        shp = shp.set_crs(gdf_inventario.crs, allow_override=True)
 
     gdf_inventario = gdf_inventario[
         gdf_inventario.geometry.within(shp.geometry.union_all())
