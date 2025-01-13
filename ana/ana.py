@@ -9,7 +9,7 @@ import httpx
 import pandas as pd
 
 from ana.config import config
-from ana.loggit import log
+from TCC.ana.logit import log
 
 
 def requisitar_inventario() -> ET.Element:

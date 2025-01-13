@@ -6,7 +6,7 @@ import geopandas as gpd
 
 from ana import ana, utils
 from ana.config import config
-from ana.loggit import console
+from TCC.ana.logit import console
 from pathlib import Path
 
 
