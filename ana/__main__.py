@@ -1,13 +1,13 @@
 """Módulo principal da aplicação src."""
 
 import asyncio
+from pathlib import Path
 
 import geopandas as gpd
 
 from ana import ana, utils
 from ana.config import config
 from TCC.ana.logit import console
-from pathlib import Path
 
 
 async def handler(data_inicio: str = "01-01-2019", data_fim: str = "") -> None:
@@ -22,7 +22,7 @@ async def handler(data_inicio: str = "01-01-2019", data_fim: str = "") -> None:
         Data final da requisição dos dados, by default "".
     """
     console.rule("Iniciando serviço de coleta de chuva horária da ANA.")
-    
+
     df_inventario = ana.mostrar_inventario()
 
     caminho_base = Path("mapas", "sub-bacias-isoladas")
@@ -30,14 +30,12 @@ async def handler(data_inicio: str = "01-01-2019", data_fim: str = "") -> None:
 
     for bacia in caminhos:
         console.rule(f"Obtendo dados de {bacia.name}")
-        
+
         caminho_csv = Path(config.diretorio_dados, bacia.name)
         caminho_csv.mkdir(parents=True, exist_ok=True)
 
         shp = gpd.read_file(bacia)
-        gdf_inventario_filtrado = utils.filtrar_postos_da_bacia(
-            df_inventario, shp
-        )
+        gdf_inventario_filtrado = utils.filtrar_postos_da_bacia(df_inventario, shp)
 
         lista_codigo = gdf_inventario_filtrado["codigo"].tolist()
 
