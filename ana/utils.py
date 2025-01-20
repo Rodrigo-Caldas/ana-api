@@ -9,19 +9,19 @@ def filtrar_postos_da_bacia(
     df: pd.DataFrame, shp: gpd.GeoDataFrame
 ) -> gpd.GeoDataFrame:
     """
-    Filtra os postos do inventário a partir do contorno shapefile da bacia.
+    Filtra os postos do inventário a partir do contorno shapefile desejado.
 
     Parameters
     ----------
     df : pd.Dataframe
-        Dataframe do inventário ANA.
+        Dataframe do inventário ANA, vinda da função obter_inventario().
     shp : gpd.GeoDataFrame
-        Contorno da bacia desejada
+        Contorno desejado.
 
     Returns
     -------
     gpd.GeoDataFrame
-        Postos que estão dentro do contorno da bacia.
+        Postos que estão dentro do contorno.
     """
     df_inventario = df.copy()
 
