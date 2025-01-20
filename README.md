@@ -72,5 +72,5 @@ docker build . -t ana-api
 Com a imagem criada, podemos criar o container onde a aplicação será rodada a partir do comando:
 
 ```bash
-docker run -v /home/rodrigocaldas/TCC/dados:/home/dados -it ana-api
+docker run -v /caminho/da/pasta/dados/local:/home/dados -it ana-api
 ```
