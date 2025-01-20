@@ -14,7 +14,7 @@ async def handler(
     data_inicio: str = "01-01-2024",
     data_fim: str = "",
     caminho_contorno: Path = Path(
-        "mapas", "sub-bacias-isoladas", "grande", "agua_vermelha.shp"
+        "mapas", "sub-bacias-isoladas", "paranapanema", "capivara.shp"
     ),
 ) -> None:
     """
