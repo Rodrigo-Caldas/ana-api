@@ -49,6 +49,12 @@ mamba env create -f requirements.yaml
 conda env create -f requirements.yaml
 ```
 
+Ative o ambiente criado:
+
+```bash
+mamba activate ana-api
+```
+
 Para testar a aplicação execute no terminal:
 
 ```bash
