@@ -42,11 +42,11 @@ Há duas maneiras de executar este repositório, utilizando conda/mamba ou docke
 Para rodar a aplicação utilizando Mamba ou Conda crie o ambiente no terminal:
 
 ```bash 
-mamba env create -f requirements.yml
+mamba env create -f requirements.yaml
 ```
  ou 
 ```bash 
-conda env create -f requirements
+conda env create -f requirements.yaml
 ```
 
 Para testar a aplicação execute no terminal:
