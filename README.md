@@ -9,9 +9,9 @@ Repositório para obtenção de dados pluviomátricos da ANA apartir dos contorn
 
 ## :world_map: Conteúdo
 1. [O que faz](#sparkles-o-que-faz)  
-2. [Como executar](#arrow_forward-como-executar)
-2.1 [Python-Mamba-Conda] :snake:
-2.2 [Docker] :whale:
+2. [Como executar](#arrow_forward-como-executar) 
+3. [Mamba-Conda](#snake-mamba-conda)
+4. [Docker](#whale-docker)
 
 
 ## :dash: Bacias
@@ -34,5 +34,9 @@ Repositório para obtenção de dados pluviomátricos da ANA apartir dos contorn
 
 Há duas maneiras de executar este repositório, utilizando conda/mamba ou docker.
 
-- [conda](https://www.anaconda.com/products/individual)
+- [Mamba](https://mamba.readthedocs.io/en/latest/installation/mamba-installation.html)
 - [Docker](https://docs.docker.com/engine/install/)
+
+## :snake: Mamba/Conda
+
+## :whale: Docker
