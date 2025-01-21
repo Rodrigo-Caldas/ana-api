@@ -4,7 +4,7 @@
 ![texto](https://img.shields.io/static/v1?label=ambiente&message=docker&color=blue&style=flat-square "linguagem")
 
 
-Repositório para obtenção de dados pluviomátricos da ANA apartir dos contornos do ONS. Os contornos são respectivamente: bacias e sub-bacias.
+Repositório para obtenção de dados pluviométricos da ANA apartir dos contornos do ONS. Os contornos são respectivamente: bacias e sub-bacias.
 
 
 ## :world_map: Conteúdo
