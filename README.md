@@ -37,6 +37,12 @@ Há duas maneiras de executar este repositório, utilizando conda/mamba ou docke
 - [Mamba](https://mamba.readthedocs.io/en/latest/installation/mamba-installation.html)
 - [Docker](https://docs.docker.com/engine/install/)
 
+Execute o comando abaixo para clonar o repositório:
+
+```bash  
+git clone https://github.com/Rodrigo-Caldas/ana-api.git
+```
+
 ## :snake: Mamba/Conda
 
 Para rodar a aplicação utilizando Mamba ou Conda crie o ambiente no terminal:
