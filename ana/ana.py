@@ -20,6 +20,11 @@ def requisitar_inventario() -> ET.Element:
     -------
     ET.Element
         Raiz do XML da requisição.
+
+    Raises
+    ------
+    e
+        Erro levantado caso ocorra.
     """
     log.info("Requisitando inventário ANA..")
 
@@ -241,6 +246,11 @@ async def obter_chuva(
         Data de início da requisição dos dados.
     data_fim : str, optional
         Data final da requisição dos dados, by default "".
+
+    Raises
+    ------
+    e
+        Erro levantado caso ocorra.
     """
     async with config.limitador_tarefas:
         async with httpx.AsyncClient() as cliente:
